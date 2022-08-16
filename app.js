@@ -6,7 +6,7 @@ const { Server } = require('socket.io');
 
 const HttpError = require('./models/http-error');
 const mainRoute = require('./routes/main-route');
-const keys = require('./keys');
+// const keys = require('./keys');
 
 
 const app = express();
@@ -18,7 +18,7 @@ const io = new Server(server, {
     }
 })
 
-const mongoUrl = `mongodb+srv://pius_gori:${process.env.mongoPassword || keys.mongoPassword}@piuscluster.wvoqx.mongodb.net/tic-tac-toe?retryWrites=true&w=majority`;
+const mongoUrl = `mongodb+srv://pius_gori:${process.env.mongoPassword}@piuscluster.wvoqx.mongodb.net/tic-tac-toe?retryWrites=true&w=majority`;
 
 app.use(bodyParser.json());
 
