@@ -102,12 +102,10 @@ exports.joinGame = async (req, res, next) => {
 }
 
 exports.changeTurn = async (req, res, next) => {
-    const { currentPlayer, playerX, playerO, map, name, gameId } = req.body;
-    const turnPlayer = currentPlayer === 'X' ? 'O' : 'X';
-    const turnPlayerName = turnPlayer === 'X' ? playerO : playerX;
+    const { currentPlayer, currentPlayerName, map, id } = req.body.game;
     let foundGame;
     try {
-        foundGame = Game.findByIdAndUpdate(gameId, { map: map, currentPlayer: turnPlayer, currentPlayerName: turnPlayerName });
+        foundGame = Game.findByIdAndUpdate(id, { map: map, currentPlayer: currentPlayer, currentPlayerName: currentPlayerName });
         if(!foundGame){
             return next(new HttpError('Game not found', [{ message: 'Game not found', type: 'game' }], 404));
         }
@@ -118,26 +116,15 @@ exports.changeTurn = async (req, res, next) => {
 }
 
 exports.gameOver = async (req, res, next) => {
-    const { newCurrentPlayer, newCurrentPlayerName, newPointsX, newPointsY, map, gameId } = req.body;
+    const { currentPlayer, currentPlayerName, pointsX, pointsO, map, id } = req.body.game;
     let foundGame
     try {
-        foundGame = await Game.findById(gameId);
+        foundGame = await Game.findByIdAndUpdate(id, { currentPlayer, currentPlayerName, pointsX, pointsO, map });
         if(!foundGame){
             return next(new HttpError('Game not found', [{ message: 'Game not found', type: 'game' }], 404));
         }
     } catch (err) {
         return next(new HttpError('Unable to update game'));
-    }
-    foundGame.map = map;
-    foundGame.pointsO = newPointsY;
-    foundGame.pointsX = newPointsX;
-    foundGame.currentPlayer = newCurrentPlayer;
-    foundGame.currentPlayerName = newCurrentPlayerName;
-
-    try {
-        await foundGame.save();
-    } catch (err) {
-        return next(new HttpError('Unable to save the game'));
     }
     res.status(200).json({ message: 'Game renewed', id: foundGame._id, currentPlayer: foundGame.currentPlayer, currentPlayerName: foundGame.currentPlayerName, map: foundGame.map, playerX: foundGame.PlayerX, playerO: foundGame.playerO, pointsO: foundGame.pointsO, pointsX: foundGame.pointsX })
 }
