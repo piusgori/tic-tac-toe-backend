@@ -122,6 +122,10 @@ io.on('connection', (socket) => {
             }
             socket.to(data.id).emit('tied_restart', updatedGameData);
         }
+    });
+
+    socket.on('left_app', (data) => {
+        socket.to(data.id).emit('opponent_left', { id: data.id, message: `${data.name} has left the app` });
     })
 })
 
